@@ -23,14 +23,7 @@ function App() {
       setTasks(updatedTasks); 
       setTaskToUpdate(null); 
     } else { 
-      const newTask = { 
-        id: Date.now(), 
-        text, 
-        priority, 
-        status, 
-        startDate: new Date().toLocaleDateString(), 
-        endDate: endDate 
-      }; 
+      const newTask = { id: Date.now(), text, priority, status, startDate: new Date().toLocaleDateString(), endDate: endDate }; 
       setTasks([...tasks, newTask]); 
     } 
     setText(''); 
@@ -53,7 +46,22 @@ function App() {
     setShowForm(true); 
   }; 
 
-  const filteredTasks = tasks.filter((task) => task.text.toLowerCase().includes(searchTerm.toLowerCase())); 
+  const filteredTasks = tasks
+    .filter((task) => task.text.toLowerCase().includes(searchTerm.toLowerCase()))
+    .sort((a, b) => {
+      const priorityOrder = { Haute: 1, Normale: 2, Basse: 3 };
+      if (priorityOrder[a.priority] < priorityOrder[b.priority]) return -1;
+      if (priorityOrder[a.priority] > priorityOrder[b.priority]) return 1;
+      if (a.endDate && b.endDate) {
+        return new Date(a.endDate) - new Date(b.endDate);
+      } else if (a.endDate) {
+        return -1;
+      } else if (b.endDate) {
+        return 1;
+      } else {
+        return 0;
+      }
+    });
 
   return ( 
     <div className="container mt-5"> 
@@ -81,7 +89,7 @@ function App() {
           ))} 
         </ul> 
       )} 
-      <button className="btn btn-primary mt-3" onClick={() => { setShowForm(true); setTaskToUpdate(null); }}>Ajouter une tâche</button> 
+<button className="btn btn-primary mt-3" onClick={() => { setShowForm(true); setTaskToUpdate(null); }}>Ajouter une tâche</button> 
       {showForm && ( 
         <form onSubmit={handleSubmit} className="mt-3"> 
           <input type="text" value={text} onChange={(e) => setText(e.target.value)} placeholder="Texte de la tâche" className="form-control mb-2" /> 
